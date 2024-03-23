@@ -9,14 +9,13 @@ df_properties =  DataFrame(
     giant_component = Int64[],
     init_avg_deg = Any[],
     p_value = Any[],
-    Degree = String[],
+    Degree_mean = Float64[],
     Gini_degree = Float64[],
-    Closeness = String[],
+    Closeness_mean = Float64[],
     Gini_close = Float64[],
-    Betweenness = Float64[],
-    Betweenness_per = String[], 
+    Betweenness_mean = Float64[],
     Gini_between = Float64[],
-    Eigenvector = String[],
+    Eigenvector_mean = Float64[],
     Gini_eigen = Float64[],
     Density = Float64[],
     Assortativity = Float64[],
@@ -34,7 +33,7 @@ function main_component(g)
     g[c[i]]
 end
 
-# obtain Q1 - Q3 and round them up
+# obtain Q1 - Q3 and round them up 
 function calculate_percentiles(var_input) 
     IQ1 = quantile(var_input, 25/100)
     IQ3 = quantile(var_input, 75/100)
@@ -65,28 +64,26 @@ function centrality_calc(network)
     giant_component = nv(largest_c)
     init_avg_deg = missing 
     p_value = missing # replace where appropriate
-    degree_cent = calculate_percentiles(degree(largest_c))
-    gini_deg = round(gini(degree(largest_c)),digits =3)
-    close_cent = calculate_percentiles(closeness_centrality(largest_c)) 
-    gini_close = round(gini(closeness_centrality(largest_c)),digits =3)
-    betweenness_cent = round(mean(betweenness_centrality(largest_c)), digits=3)
-    betweenness_cent_per = calculate_percentiles(betweenness_centrality(largest_c)) #  essential to get the right estimate
-    gini_between = round(gini(betweenness_centrality(largest_c)),digits =3)
-    eigen_cent = calculate_percentiles(eigenvector_centrality(largest_c))
-    gini_eigen = round(gini(eigenvector_centrality(largest_c)),digits =3)
-    density_value = round(density(largest_c),digits =3)
-    assort = round(assortativity(largest_c),digits =3)
-    clustering = round(mean(local_clustering_coefficient(largest_c)),digits =3)
-    global_transit = round(global_clustering_coefficient(largest_c),digits =3)
-    # modularity_measure = round(modularity(largest_c), digits = 3)
-    geodesic_mean = round(mean(calculate_geodesic(largest_c)),digits =3)
-    geodesic_gini =	round(gini(calculate_geodesic(largest_c)),digits =3)
-    diameter_v = round(diameter(largest_c),digits =3)
+    degree_cent_mean = mean(degree(largest_c))
+    gini_deg = gini(degree(largest_c))
+    close_cent = mean(closeness_centrality(largest_c))
+    gini_close = gini(closeness_centrality(largest_c))
+    betweenness_cent = mean(betweenness_centrality(largest_c))
+    gini_between = gini(betweenness_centrality(largest_c))
+    eigen_cent = mean(eigenvector_centrality(largest_c))
+    gini_eigen = gini(eigenvector_centrality(largest_c))
+    density_value = density(largest_c)
+    assort = assortativity(largest_c)
+    clustering = mean(local_clustering_coefficient(largest_c))
+    global_transit = global_clustering_coefficient(largest_c)
+    geodesic_mean = mean(calculate_geodesic(largest_c))
+    geodesic_gini =	gini(calculate_geodesic(largest_c))
+    diameter_v = diameter(largest_c)
     
-    # append to dataframe
-    push!(df_properties, (n_nodes,n_edges,giant_component, init_avg_deg, p_value, degree_cent, gini_deg, close_cent, gini_close, betweenness_cent,betweenness_cent_per, gini_between, 
-    eigen_cent, gini_eigen, density_value, assort, clustering, global_transit, geodesic_mean,geodesic_gini, diameter_v)) 
-
+    push!(df_properties, (n_nodes,n_edges,giant_component, init_avg_deg, p_value,degree_cent_mean, gini_deg,close_cent,gini_close, 
+    betweenness_cent,gini_between, eigen_cent, gini_eigen, density_value, assort, clustering, global_transit, geodesic_mean,
+    geodesic_gini, diameter_v))
+    
     return df_properties
 end
 
